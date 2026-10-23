@@ -1,0 +1,30 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import ProjectDetail from '../components/ProjectDetail.astro';
+import { site } from '../content/site';
+
+const visibleSections = site.sections.filter((section) => section.visible);
+const section = site.sections.find((item) => item.id === 'projects')!;
+const order = visibleSections.findIndex((item) => item.id === 'projects') + 1;
+---
+
+<PageLayout
+  title={`${section.label} — ${site.name}`}
+  description={`${section.label} — ${site.tagline}`}
+  current="projects"
+>
+  <PageIntro index={order} label={section.label} />
+
+  <div class="container">
+    {site.projects.map((project, index) => (
+      <ProjectDetail project={project} ui={site.ui} index={index} />
+    ))}
+  </div>
+</PageLayout>
+
+<style>
+  .container {
+    padding-block: clamp(2rem, 5vw, 4rem) clamp(3rem, 8vw, 7rem);
+  }
+</style>

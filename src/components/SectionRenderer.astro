@@ -1,0 +1,31 @@
+---
+import type { Section, SiteContent } from '../content/site';
+import AboutSection from './AboutSection.astro';
+import ContactSection from './ContactSection.astro';
+import ProjectsSection from './ProjectsSection.astro';
+import SkillsSection from './SkillsSection.astro';
+
+interface Props {
+  section: Section;
+  content: SiteContent;
+  order: number;
+}
+
+const { section, content, order } = Astro.props;
+---
+
+{section.id === 'projects' && content.projects.length > 0 && (
+  <ProjectsSection section={section} projects={content.projects} ui={content.ui} order={order} />
+)}
+
+{section.id === 'about' && content.bio.length > 0 && (
+  <AboutSection section={section} bio={content.bio} tagline={content.tagline} order={order} />
+)}
+
+{section.id === 'skills' && content.skills.length > 0 && (
+  <SkillsSection section={section} groups={content.skills} order={order} />
+)}
+
+{section.id === 'contact' && content.contact.length > 0 && (
+  <ContactSection section={section} links={content.contact} order={order} />
+)}

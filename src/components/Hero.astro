@@ -1,0 +1,448 @@
+---
+import type { Section } from '../content/site';
+import Icon from './Icon.astro';
+
+interface Props {
+  name: string;
+  handle: string;
+  tagline: string;
+  sections: Section[];
+}
+
+const { name, handle, tagline, sections } = Astro.props;
+
+const words = name.trim().split(/\s+/);
+let characterIndex = 0;
+const animatedWords = words.map((word) =>
+  Array.from(word).map((character) => ({
+    character,
+    index: characterIndex++,
+  })),
+);
+
+const primarySection = sections[0];
+const secondarySection = sections.length > 1 ? sections[sections.length - 1] : undefined;
+
+const taglineWords = tagline.trim().split(/\s+/);
+---
+
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <span class="hero__shape hero__shape--outline" aria-hidden="true"></span>
+  <span class="hero__shape hero__shape--block" aria-hidden="true"></span>
+  <span class="hero__shape hero__shape--bar" aria-hidden="true"></span>
+
+  <div class="container hero__inner">
+    <div class="hero__meta">
+      <span class="hero__handle mono">@{handle}</span>
+      <span class="hero__meta-line" aria-hidden="true"></span>
+    </div>
+
+    <div class="hero__body">
+      <h1 class="hero__name" id="hero-title" aria-label={name}>
+        <span class="hero__name-words" aria-hidden="true">
+          {animatedWords.map((word) => (
+            <span class="hero__word">
+              {word.map(({ character, index }) => (
+                <span class="hero__char" style={`--char-index: ${index}`}>{character}</span>
+              ))}
+            </span>
+          ))}
+        </span>
+      </h1>
+
+      <div class="hero__lower">
+        {primarySection && (
+          <div class="hero__actions">
+            <a class="hero__primary" href={`#${primarySection.id}`}>
+              <span>{primarySection.label}</span>
+              <Icon name="arrow-down" />
+            </a>
+            {secondarySection && (
+              <a class="hero__secondary" href={`#${secondarySection.id}`}>
+                <span>{secondarySection.label}</span>
+                <Icon name="arrow-up-right" />
+              </a>
+            )}
+          </div>
+        )}
+
+        <p class="hero__tagline">
+          {taglineWords.map((word, index) => (
+            <>
+              <span class="hero__tagline-word">
+                <span class="hero__tagline-inner" style={`--word-index: ${index}`}>
+                  {word}
+                </span>
+              </span>{' '}
+            </>
+          ))}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+  }
+
+  .hero__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    min-height: calc(100svh - 4.7rem);
+    padding-block: var(--space-lg) var(--space-2xl);
+  }
+
+  .hero__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    color: var(--color-text-muted);
+  }
+
+  .hero__meta-line {
+    height: var(--line-width);
+    flex: 1;
+    background: var(--color-line-strong);
+    transform-origin: 0 50%;
+    animation: rule-draw 1400ms var(--ease-dramatic) 260ms both;
+  }
+
+  @keyframes rule-draw {
+    from {
+      scale: 0 1;
+    }
+
+    to {
+      scale: 1 1;
+    }
+  }
+
+  .hero__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(2rem, 6vh, 6rem);
+    padding-block: clamp(1rem, 4vh, 4rem);
+  }
+
+  .hero__name {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    font-family: var(--font-display);
+    font-size: var(--text-hero);
+    font-weight: 700;
+    letter-spacing: -0.075em;
+    line-height: 0.76;
+  }
+
+  .hero__name-words {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.16em;
+  }
+
+  .hero__word {
+    display: inline-flex;
+  }
+
+  .hero__char {
+    display: inline-block;
+    animation: char-in 1250ms var(--ease-dramatic) both;
+    animation-delay: calc(90ms + (var(--char-index) * 62ms));
+  }
+
+  .hero__lower {
+    display: grid;
+    grid-template-columns: minmax(12rem, 0.8fr) minmax(18rem, 1.2fr);
+    gap: var(--space-2xl);
+    align-items: end;
+    border-top: var(--line-width) solid var(--color-line-strong);
+    padding-top: var(--space-xl);
+    animation: fade-in 900ms var(--ease-out) 500ms both;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .hero__primary,
+  .hero__secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition:
+      background-color var(--dur-fast) var(--ease-in-out),
+      color var(--dur-fast) var(--ease-in-out),
+      translate var(--dur-fast) var(--ease-in-out);
+  }
+
+  .hero__primary {
+    padding: 1rem 1.15rem;
+    border: var(--line-width) solid var(--color-invert-bg);
+    background: var(--color-invert-bg);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-accent);
+    color: var(--color-invert-text);
+  }
+
+  .hero__primary:hover,
+  .hero__primary:focus-visible {
+    translate: var(--shadow-offset) var(--shadow-offset);
+    box-shadow: 0 0 0 var(--color-accent);
+  }
+
+  .hero__secondary {
+    padding-block: 0.4rem;
+    border-bottom: var(--line-width) solid var(--color-line-strong);
+  }
+
+  .hero__secondary:hover,
+  .hero__secondary:focus-visible {
+    border-color: var(--color-accent-2);
+    color: var(--color-accent-2);
+    translate: 0 -0.2rem;
+  }
+
+  .hero__tagline {
+    justify-self: end;
+    max-width: 22ch;
+    font-family: var(--font-display);
+    font-size: var(--text-tagline);
+    font-weight: 500;
+    letter-spacing: var(--tracking-snug);
+    line-height: var(--leading-snug);
+    text-wrap: balance;
+  }
+
+  .hero__tagline-word {
+    display: inline-block;
+    overflow: clip;
+    padding-block: 0.06em 0.16em;
+    margin-block: -0.06em -0.16em;
+    vertical-align: bottom;
+  }
+
+  .hero__tagline-inner {
+    display: inline-block;
+    animation: word-rise 1050ms var(--ease-dramatic) both;
+    animation-delay: calc(520ms + (var(--word-index) * 52ms));
+  }
+
+  @keyframes word-rise {
+    from {
+      translate: 0 118%;
+      rotate: 4deg;
+    }
+
+    to {
+      translate: 0 0;
+      rotate: 0deg;
+    }
+  }
+
+  .hero__shape {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .hero__shape--outline {
+    top: 18%;
+    right: -2.5rem;
+    width: clamp(6rem, 16vw, 15rem);
+    aspect-ratio: 1;
+    border: clamp(0.3rem, 0.7vw, 0.7rem) solid var(--color-accent-2);
+    rotate: 12deg;
+    animation: slow-spin 26s linear infinite;
+  }
+
+  .hero__shape--block {
+    right: 12%;
+    bottom: 8%;
+    width: clamp(4rem, 10vw, 9rem);
+    aspect-ratio: 1;
+    background: var(--color-accent-3-soft);
+    border: var(--line-width) solid var(--color-accent-3);
+    rotate: 45deg;
+    animation: bob 8s var(--ease-in-out) infinite alternate;
+  }
+
+  .hero__shape--bar {
+    left: -4rem;
+    bottom: 23%;
+    width: clamp(10rem, 28vw, 26rem);
+    height: clamp(0.6rem, 1.2vw, 1.2rem);
+    background: var(--color-accent);
+    rotate: -8deg;
+    animation: slide 12s var(--ease-in-out) infinite alternate;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .hero__shape--outline {
+      animation:
+        slow-spin 26s linear infinite,
+        parallax-rise linear both;
+      animation-timeline: auto, scroll(root);
+      animation-range: normal, 0 100vh;
+    }
+
+    .hero__shape--block {
+      animation:
+        bob 8s var(--ease-in-out) infinite alternate,
+        parallax-fall linear both;
+      animation-timeline: auto, scroll(root);
+      animation-range: normal, 0 100vh;
+    }
+
+    .hero__shape--bar {
+      animation:
+        slide 12s var(--ease-in-out) infinite alternate,
+        parallax-fall linear both;
+      animation-timeline: auto, scroll(root);
+      animation-range: normal, 0 100vh;
+    }
+  }
+
+  @keyframes char-in {
+    from {
+      opacity: 0;
+      translate: 0 0.72em;
+      rotate: -16deg;
+      scale: 0.82;
+      filter: blur(14px);
+    }
+
+    55% {
+      opacity: 1;
+      filter: blur(0);
+    }
+
+    to {
+      opacity: 1;
+      translate: 0 0;
+      rotate: 0deg;
+      scale: 1;
+      filter: blur(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      translate: 0 1.5rem;
+    }
+
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  @keyframes slow-spin {
+    to {
+      rotate: 372deg;
+    }
+  }
+
+  @keyframes bob {
+    from {
+      rotate: 45deg;
+      scale: 1;
+    }
+
+    to {
+      rotate: 84deg;
+      scale: 1.14;
+    }
+  }
+
+  @keyframes slide {
+    from {
+      rotate: -8deg;
+    }
+
+    to {
+      rotate: -2deg;
+    }
+  }
+
+  @keyframes parallax-fall {
+    from {
+      translate: 0 -4rem;
+    }
+
+    to {
+      translate: 0 18rem;
+    }
+  }
+
+  @keyframes parallax-rise {
+    from {
+      translate: 0 6rem;
+    }
+
+    to {
+      translate: 0 -14rem;
+    }
+  }
+
+  @media (max-width: 64rem) {
+    .hero__lower {
+      grid-template-columns: 1fr;
+      gap: var(--space-xl);
+    }
+
+    .hero__tagline {
+      max-width: 24ch;
+      justify-self: start;
+    }
+  }
+
+  @media (max-width: 44rem) {
+    .hero__inner {
+      min-height: calc(100svh - 6.2rem);
+      padding-block: var(--space-md) var(--space-2xl);
+    }
+
+    .hero__name {
+      letter-spacing: -0.065em;
+    }
+
+    .hero__shape--outline {
+      top: 13%;
+      right: -4rem;
+      opacity: 0.7;
+    }
+
+    .hero__shape--block {
+      right: 4%;
+      bottom: 4%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__char,
+    .hero__lower,
+    .hero__shape,
+    .hero__meta-line,
+    .hero__tagline-inner {
+      animation: none;
+    }
+  }
+</style>

@@ -1,0 +1,416 @@
+---
+import type { Project, SiteContent } from '../content/site';
+import Icon from './Icon.astro';
+
+interface Props {
+  project: Project;
+  ui: SiteContent['ui'];
+  index: number;
+}
+
+const { project, ui, index } = Astro.props;
+const number = String(index + 1).padStart(2, '0');
+const { detail } = project;
+---
+
+<article
+  class="detail"
+  id={`detail-${project.id}`}
+  aria-labelledby={`${project.id}-detail-title`}
+>
+  <div class="detail__visual" data-tone={project.media.tone}>
+    <span class="detail__grid" aria-hidden="true"></span>
+    <span class="detail__visual-index" aria-hidden="true">{number}</span>
+    <img
+      src={project.media.src}
+      alt={project.media.alt}
+      width={project.media.width}
+      height={project.media.height}
+      loading="lazy"
+      decoding="async"
+    />
+    {project.aiDirected && <span class="detail__badge">{ui.aiBadge}</span>}
+  </div>
+
+  <div class="detail__content">
+    <div class="detail__eyebrow">
+      <span class="mono">{number}</span>
+      <span class="detail__eyebrow-line" aria-hidden="true"></span>
+    </div>
+
+    <p class="detail__tagline">{detail.tagline}</p>
+    <h2 class="detail__title" id={`${project.id}-detail-title`}>{project.name}</h2>
+    <p class="detail__what">{detail.what}</p>
+
+    <div class="detail__why">
+      <h3 class="detail__label mono">{ui.projectWhy}</h3>
+      <p class="detail__why-text">{project.why}</p>
+    </div>
+
+    <section class="detail__block">
+      <h3 class="detail__label mono">{ui.projectDoes}</h3>
+      <ul class="detail__list">
+        {detail.highlights.map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="detail__block">
+      <h3 class="detail__label mono">{ui.projectHow}</h3>
+      <ol class="detail__steps">
+        {detail.how.map((item) => (
+          <li>{item}</li>
+        ))}
+      </ol>
+    </section>
+
+    {detail.limits.length > 0 && (
+      <section class="detail__block">
+        <h3 class="detail__label mono">{ui.projectLimits}</h3>
+        <ul class="detail__list detail__list--limits">
+          {detail.limits.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <section class="detail__block">
+      <h3 class="detail__label mono">{ui.projectFacts}</h3>
+      <dl class="detail__facts">
+        {detail.facts.map((fact) => (
+          <div class="detail__fact">
+            <dt class="mono">{fact.label}</dt>
+            <dd>{fact.value}</dd>
+          </div>
+        ))}
+        <div class="detail__fact">
+          <dt class="mono">{ui.projectTech}</dt>
+          <dd>{project.tech.join(', ')}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <div class="detail__links">
+      {project.links.map((link) => (
+        <a class:list={['detail__link', `detail__link--${link.kind}`]} href={link.href}>
+          <span>{link.kind === 'release' ? ui.links.release : ui.links.source}</span>
+          <Icon name="arrow-up-right" />
+        </a>
+      ))}
+    </div>
+  </div>
+</article>
+
+<style>
+  .detail {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    padding-block: clamp(2.5rem, 7vw, 6rem);
+    border-bottom: var(--line-width) solid var(--color-line-strong);
+  }
+
+  .detail:first-of-type {
+    padding-top: 0;
+  }
+
+  .detail__visual {
+    position: relative;
+    display: grid;
+    align-self: start;
+    aspect-ratio: 1;
+    place-items: center;
+    overflow: clip;
+    border: var(--line-width) solid var(--project-accent);
+    background: var(--project-stage);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--project-accent);
+    color: var(--project-ink);
+  }
+
+  .detail__visual[data-tone='gold'] {
+    --project-stage: var(--tone-gold-stage);
+    --project-ink: var(--tone-gold-ink);
+    --project-accent: var(--tone-gold-accent);
+  }
+
+  .detail__visual[data-tone='violet'] {
+    --project-stage: var(--tone-violet-stage);
+    --project-ink: var(--tone-violet-ink);
+    --project-accent: var(--tone-violet-accent);
+  }
+
+  .detail__visual[data-tone='green'] {
+    --project-stage: var(--tone-green-stage);
+    --project-ink: var(--tone-green-ink);
+    --project-accent: var(--tone-green-accent);
+  }
+
+  .detail__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--project-accent) var(--line-width), transparent var(--line-width)),
+      linear-gradient(90deg, var(--project-accent) var(--line-width), transparent var(--line-width));
+    background-size: 13.33% 13.33%;
+    opacity: 0.14;
+  }
+
+  .detail__visual-index {
+    position: absolute;
+    right: 0.06em;
+    bottom: -0.17em;
+    color: transparent;
+    font-family: var(--font-display);
+    font-size: clamp(6rem, 14vw, 16rem);
+    font-weight: 700;
+    letter-spacing: -0.08em;
+    line-height: var(--leading-none);
+    opacity: 0.3;
+    -webkit-text-stroke: var(--line-width) var(--project-accent);
+  }
+
+  .detail__visual img {
+    position: relative;
+    z-index: 1;
+    width: min(72%, 22rem);
+    height: auto;
+    object-fit: contain;
+  }
+
+  .detail__badge {
+    position: absolute;
+    top: var(--space-md);
+    left: var(--space-md);
+    z-index: 2;
+    padding: 0.45rem 0.55rem;
+    border: var(--line-width) solid var(--color-bg);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    line-height: 1;
+    rotate: -3deg;
+    text-transform: uppercase;
+  }
+
+  .detail__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .detail__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    color: var(--color-accent);
+  }
+
+  .detail__eyebrow-line {
+    width: 2.8rem;
+    height: var(--line-width);
+    background: currentColor;
+  }
+
+  .detail__tagline {
+    max-width: 34ch;
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    letter-spacing: var(--tracking-wide);
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .detail__title {
+    font-size: var(--text-project);
+    font-weight: 700;
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-none);
+  }
+
+  .detail__what {
+    max-width: 46rem;
+    font-size: var(--text-lead);
+    line-height: var(--leading-snug);
+    text-wrap: pretty;
+  }
+
+  .detail__why {
+    padding-top: var(--space-md);
+    border-top: var(--line-width) solid var(--color-line);
+  }
+
+  .detail__why-text {
+    max-width: 40rem;
+    color: var(--color-text-muted);
+  }
+
+  .detail__block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+    border-top: var(--line-width) solid var(--color-line);
+  }
+
+  .detail__label {
+    color: var(--color-text-muted);
+  }
+
+  .detail__list,
+  .detail__steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    max-width: 44rem;
+  }
+
+  .detail__list li {
+    position: relative;
+    padding-left: var(--space-lg);
+    line-height: var(--leading-snug);
+  }
+
+  .detail__list li::before {
+    position: absolute;
+    top: 0.55em;
+    left: 0;
+    width: 0.5em;
+    height: 0.5em;
+    background: var(--color-accent);
+    content: '';
+    rotate: 45deg;
+  }
+
+  .detail__list--limits li::before {
+    background: var(--color-alert);
+  }
+
+  .detail__steps {
+    counter-reset: step;
+  }
+
+  .detail__steps li {
+    position: relative;
+    padding-left: 2.6rem;
+    line-height: var(--leading-snug);
+    counter-increment: step;
+  }
+
+  .detail__steps li::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    content: counter(step, decimal-leading-zero);
+  }
+
+  .detail__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: var(--space-md) var(--space-xl);
+  }
+
+  .detail__fact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .detail__fact dt {
+    color: var(--color-text-muted);
+    font-size: var(--text-micro);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .detail__fact dd {
+    font-size: var(--text-body);
+    line-height: var(--leading-snug);
+  }
+
+  .detail__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+  }
+
+  .detail__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 0.75rem 0.85rem;
+    border: var(--line-width) solid var(--color-line-strong);
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition:
+      background-color var(--dur-fast) var(--ease-in-out),
+      border-color var(--dur-fast) var(--ease-in-out),
+      color var(--dur-fast) var(--ease-in-out),
+      translate var(--dur-fast) var(--ease-in-out);
+  }
+
+  .detail__link--release {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .detail__link:hover,
+  .detail__link:focus-visible {
+    border-color: var(--color-invert-bg);
+    background: var(--color-invert-bg);
+    color: var(--color-invert-text);
+    translate: 0 -0.2rem;
+  }
+
+  .detail__link :global(svg) {
+    transition: translate var(--dur-fast) var(--ease-out);
+  }
+
+  .detail__link:hover :global(svg),
+  .detail__link:focus-visible :global(svg) {
+    translate: 0.2rem -0.2rem;
+  }
+
+  @media (max-width: 64rem) {
+    .detail {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .detail__visual {
+      width: min(100%, 30rem);
+    }
+  }
+
+  @media (max-width: 44rem) {
+    .detail__visual {
+      width: 100%;
+    }
+
+    .detail__link {
+      flex: 1 1 auto;
+      justify-content: space-between;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .detail__link,
+    .detail__link :global(svg) {
+      transition: none;
+    }
+  }
+</style>

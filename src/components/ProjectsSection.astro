@@ -1,0 +1,38 @@
+---
+import type { Project, Section, SiteContent } from '../content/site';
+import ProjectCard from './ProjectCard.astro';
+import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  section: Section;
+  projects: Project[];
+  ui: SiteContent['ui'];
+  order: number;
+  showHeading?: boolean;
+}
+
+const { section, projects, ui, order, showHeading = true } = Astro.props;
+---
+
+<section
+  class="section projects"
+  id={section.id}
+  aria-labelledby={showHeading ? `${section.id}-title` : undefined}
+  aria-label={showHeading ? undefined : section.label}
+>
+  <div class="container section__inner">
+    {showHeading && <SectionHeading index={order} id={section.id} label={section.label} />}
+
+    <div class="projects__list">
+      {projects.map((project, index) => (
+        <ProjectCard project={project} ui={ui} index={index} />
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .projects__list {
+    border-bottom: var(--line-width) solid var(--color-line-strong);
+  }
+</style>

@@ -1,0 +1,482 @@
+---
+import type { Project, SiteContent } from '../content/site';
+import Icon from './Icon.astro';
+
+interface Props {
+  project: Project;
+  ui: SiteContent['ui'];
+  index: number;
+}
+
+const { project, ui, index } = Astro.props;
+const number = String(index + 1).padStart(2, '0');
+---
+
+<article
+  class:list={['project', { 'project--flip': index % 2 === 1 }]}
+  data-reveal="scale"
+  style={`--reveal-order: ${index}`}
+  aria-labelledby={`${project.id}-title`}
+>
+  <div class="project__visual" data-tone={project.media.tone}>
+    <span class="project__visual-grid" aria-hidden="true"></span>
+    <span class="project__visual-index" aria-hidden="true">{number}</span>
+    <div class="project__logo-wrap">
+      <img
+        src={project.media.src}
+        alt={project.media.alt}
+        width={project.media.width}
+        height={project.media.height}
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+    {project.aiDirected && <span class="project__badge">{ui.aiBadge}</span>}
+  </div>
+
+  <div class="project__content">
+    <div class="project__eyebrow">
+      <span class="mono">{number}</span>
+      <span class="project__eyebrow-line" aria-hidden="true"></span>
+    </div>
+
+    <h3 class="project__title" id={`${project.id}-title`}>{project.name}</h3>
+    <p class="project__summary">{project.summary}</p>
+
+    <div class="project__details">
+      <div>
+        <h4 class="project__detail-label mono">{ui.projectWhy}</h4>
+        <p class="project__why">{project.why}</p>
+      </div>
+
+      <div>
+        <h4 class="project__detail-label mono">{ui.projectTech}</h4>
+        <ul class="project__tech">
+          {project.tech.map((tech) => (
+            <li>{tech}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div class="project__links">
+      {project.links.map((link) => (
+        <a class:list={['project__link', `project__link--${link.kind}`]} href={link.href}>
+          <span>{link.kind === 'release' ? ui.links.release : ui.links.source}</span>
+          <Icon name="arrow-up-right" />
+        </a>
+      ))}
+    </div>
+  </div>
+</article>
+
+<style>
+  .project {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: clamp(2rem, 5vw, 6rem);
+    padding-block: clamp(2.5rem, 6vw, 6rem);
+    border-top: var(--line-width) solid var(--color-line-strong);
+  }
+
+  .project__visual {
+    position: relative;
+    display: grid;
+    grid-column: 1 / span 5;
+    aspect-ratio: 1;
+    place-items: center;
+    overflow: clip;
+    border: var(--line-width) solid var(--project-accent);
+    background: var(--project-stage);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--project-accent);
+    color: var(--project-ink);
+    transition:
+      box-shadow var(--dur-mid) var(--ease-out),
+      translate var(--dur-mid) var(--ease-out);
+  }
+
+  .project--flip .project__visual {
+    grid-column: 8 / -1;
+  }
+
+  .project:hover .project__visual {
+    translate: calc(var(--shadow-offset) * -0.5) calc(var(--shadow-offset) * -0.5);
+    box-shadow: calc(var(--shadow-offset) * 1.5) calc(var(--shadow-offset) * 1.5) 0
+      var(--project-accent);
+  }
+
+  .project__visual[data-tone='gold'] {
+    --project-stage: var(--tone-gold-stage);
+    --project-ink: var(--tone-gold-ink);
+    --project-accent: var(--tone-gold-accent);
+  }
+
+  .project__visual[data-tone='violet'] {
+    --project-stage: var(--tone-violet-stage);
+    --project-ink: var(--tone-violet-ink);
+    --project-accent: var(--tone-violet-accent);
+  }
+
+  .project__visual[data-tone='green'] {
+    --project-stage: var(--tone-green-stage);
+    --project-ink: var(--tone-green-ink);
+    --project-accent: var(--tone-green-accent);
+  }
+
+  .project__visual-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--project-accent) var(--line-width), transparent var(--line-width)),
+      linear-gradient(90deg, var(--project-accent) var(--line-width), transparent var(--line-width));
+    background-size: 13.33% 13.33%;
+    opacity: 0.14;
+    transition:
+      opacity var(--dur-slow) var(--ease-out),
+      background-position 1100ms var(--ease-dramatic),
+      scale 1100ms var(--ease-dramatic);
+  }
+
+  .project:hover .project__visual-grid {
+    background-position: 1.6rem 1.6rem;
+    opacity: 0.28;
+    scale: 1.1;
+  }
+
+  .project__visual-index {
+    position: absolute;
+    right: 0.06em;
+    bottom: -0.17em;
+    color: transparent;
+    font-family: var(--font-display);
+    font-size: clamp(8rem, 20vw, 22rem);
+    font-weight: 700;
+    letter-spacing: -0.08em;
+    line-height: var(--leading-none);
+    opacity: 0.3;
+    transition:
+      translate 1100ms var(--ease-dramatic),
+      opacity var(--dur-slow) var(--ease-out);
+    -webkit-text-stroke: var(--line-width) var(--project-accent);
+  }
+
+  .project:hover .project__visual-index {
+    translate: -0.5rem -1.2rem;
+    opacity: 0.55;
+  }
+
+  .project__logo-wrap {
+    position: relative;
+    z-index: 1;
+    width: min(76%, 28rem);
+    rotate: -3deg;
+    transition:
+      rotate var(--dur-slow) var(--ease-out),
+      scale var(--dur-slow) var(--ease-out),
+      translate var(--dur-slow) var(--ease-out);
+  }
+
+  .project--flip .project__logo-wrap {
+    rotate: 3deg;
+  }
+
+  .project:hover .project__logo-wrap {
+    rotate: 0deg;
+    scale: 1.04;
+    translate: 0 -0.6rem;
+  }
+
+  .project__logo-wrap img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .project__badge {
+    position: absolute;
+    top: var(--space-md);
+    left: var(--space-md);
+    z-index: 2;
+    padding: 0.45rem 0.55rem;
+    border: var(--line-width) solid var(--color-bg);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    line-height: 1;
+    rotate: -3deg;
+    text-transform: uppercase;
+  }
+
+  .project:hover .project__badge {
+    animation: badge-pulse 1600ms var(--ease-in-out) infinite alternate;
+  }
+
+  @keyframes badge-pulse {
+    from {
+      rotate: -3deg;
+      scale: 1;
+    }
+
+    to {
+      rotate: 2deg;
+      scale: 1.08;
+    }
+  }
+
+  .project__content {
+    display: flex;
+    grid-column: 7 / -1;
+    flex-direction: column;
+    align-self: center;
+    gap: var(--space-lg);
+  }
+
+  .project--flip .project__content {
+    grid-column: 1 / span 6;
+    grid-row: 1;
+  }
+
+  .project__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    color: var(--color-accent);
+  }
+
+  .project__eyebrow-line {
+    width: 2.8rem;
+    height: var(--line-width);
+    background: currentColor;
+  }
+
+  .project__title {
+    font-size: var(--text-project);
+    font-weight: 700;
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-none);
+  }
+
+  .project__summary {
+    max-width: 40rem;
+    font-size: var(--text-lead);
+    line-height: var(--leading-snug);
+    text-wrap: pretty;
+  }
+
+  .project__details {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(12rem, 0.8fr);
+    gap: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: var(--line-width) solid var(--color-line);
+  }
+
+  .project__detail-label {
+    margin-bottom: var(--space-sm);
+    color: var(--color-text-muted);
+  }
+
+  .project__why {
+    max-width: 30rem;
+    color: var(--color-text-muted);
+  }
+
+  .project__tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .project__tech li {
+    padding: 0.35rem 0.45rem;
+    border: var(--line-width) solid var(--color-line-strong);
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+    transition:
+      translate var(--dur-mid) var(--ease-spring),
+      border-color var(--dur-mid) var(--ease-in-out),
+      background-color var(--dur-mid) var(--ease-in-out);
+  }
+
+  .project:hover .project__tech li,
+  .project:focus-within .project__tech li {
+    translate: 0 -0.22rem;
+    border-color: var(--color-accent);
+  }
+
+  .project:hover .project__tech li:nth-child(2),
+  .project:focus-within .project__tech li:nth-child(2) {
+    transition-delay: 45ms;
+  }
+
+  .project:hover .project__tech li:nth-child(3),
+  .project:focus-within .project__tech li:nth-child(3) {
+    transition-delay: 90ms;
+  }
+
+  .project:hover .project__tech li:nth-child(4),
+  .project:focus-within .project__tech li:nth-child(4) {
+    transition-delay: 135ms;
+  }
+
+  .project:hover .project__tech li:nth-child(5),
+  .project:focus-within .project__tech li:nth-child(5) {
+    transition-delay: 180ms;
+  }
+
+  .project__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+  }
+
+  .project__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 0.75rem 0.85rem;
+    border: var(--line-width) solid var(--color-line-strong);
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition:
+      background-color var(--dur-fast) var(--ease-in-out),
+      border-color var(--dur-fast) var(--ease-in-out),
+      color var(--dur-fast) var(--ease-in-out),
+      translate var(--dur-fast) var(--ease-in-out);
+  }
+
+  .project__link--release {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .project__link:hover,
+  .project__link:focus-visible {
+    border-color: var(--color-invert-bg);
+    background: var(--color-invert-bg);
+    color: var(--color-invert-text);
+    translate: 0 -0.2rem;
+  }
+
+  .project__link :global(svg) {
+    transition: translate var(--dur-fast) var(--ease-out);
+  }
+
+  .project__link:hover :global(svg),
+  .project__link:focus-visible :global(svg) {
+    translate: 0.2rem -0.2rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :root.js .project__eyebrow,
+    :root.js .project__title,
+    :root.js .project__summary,
+    :root.js .project__details,
+    :root.js .project__links {
+      opacity: 0;
+      translate: 0 1.8rem;
+      transition:
+        opacity 780ms var(--ease-dramatic),
+        translate 980ms var(--ease-dramatic);
+    }
+
+    :root.js .project.is-revealed .project__eyebrow {
+      opacity: 1;
+      translate: 0 0;
+      transition-delay: 200ms;
+    }
+
+    :root.js .project.is-revealed .project__title {
+      opacity: 1;
+      translate: 0 0;
+      transition-delay: 290ms;
+    }
+
+    :root.js .project.is-revealed .project__summary {
+      opacity: 1;
+      translate: 0 0;
+      transition-delay: 380ms;
+    }
+
+    :root.js .project.is-revealed .project__details {
+      opacity: 1;
+      translate: 0 0;
+      transition-delay: 470ms;
+    }
+
+    :root.js .project.is-revealed .project__links {
+      opacity: 1;
+      translate: 0 0;
+      transition-delay: 560ms;
+    }
+  }
+
+  @media (max-width: 64rem) {
+    .project {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-2xl);
+    }
+
+    .project__visual,
+    .project--flip .project__visual {
+      grid-column: 1;
+      width: min(100%, 38rem);
+    }
+
+    .project__content,
+    .project--flip .project__content {
+      grid-column: 1;
+      grid-row: auto;
+    }
+
+    .project--flip .project__visual {
+      justify-self: end;
+    }
+  }
+
+  @media (max-width: 44rem) {
+    .project__visual,
+    .project--flip .project__visual {
+      width: 100%;
+    }
+
+    .project__details {
+      grid-template-columns: 1fr;
+    }
+
+    .project__link {
+      flex: 1 1 auto;
+      justify-content: space-between;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project__visual,
+    .project__logo-wrap,
+    .project__link,
+    .project__visual-grid,
+    .project__visual-index,
+    .project__tech li,
+    .project__link :global(svg) {
+      transition: none;
+    }
+
+    .project:hover .project__badge {
+      animation: none;
+    }
+  }
+</style>

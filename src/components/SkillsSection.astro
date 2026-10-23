@@ -1,0 +1,266 @@
+---
+import type { Section, SkillGroup } from '../content/site';
+import SectionHeading from './SectionHeading.astro';
+
+interface UsageProject {
+  id: string;
+  name: string;
+}
+
+interface Props {
+  section: Section;
+  groups: SkillGroup[];
+  order: number;
+  showHeading?: boolean;
+  groupLevel?: 2 | 3;
+  usage?: Record<string, UsageProject[]>;
+  usedInLabel?: string;
+}
+
+const {
+  section,
+  groups,
+  order,
+  showHeading = true,
+  groupLevel = 3,
+  usage,
+  usedInLabel,
+} = Astro.props;
+---
+
+<section
+  class="section skills"
+  id={section.id}
+  aria-labelledby={showHeading ? `${section.id}-title` : undefined}
+  aria-label={showHeading ? undefined : section.label}
+>
+  <div class="container section__inner">
+    {showHeading && <SectionHeading index={order} id={section.id} label={section.label} />}
+
+    <div class="skills__grid">
+      {groups.map((group, groupIndex) => (
+        <article
+          class="skills__group"
+          data-group={group.id}
+          data-reveal
+          style={`--reveal-order: ${groupIndex}`}
+        >
+          {groupLevel === 2 ? (
+            <h2 class="skills__title">{group.label}</h2>
+          ) : (
+            <h3 class="skills__title">{group.label}</h3>
+          )}
+          <ul class="skills__list">
+            {group.items.map((item, itemIndex) => (
+              <li class="skills__item">
+                <span class="skills__index mono" aria-hidden="true">
+                  {String(itemIndex + 1).padStart(2, '0')}
+                </span>
+                <span>{item}</span>
+                {usage?.[item]?.length ? (
+                  <span class="skills__used">
+                    <span class="skills__used-label mono">{usedInLabel}</span>
+                    {usage[item].map((project) => (
+                      <a class="skills__used-link" href={`/projects#detail-${project.id}`}>
+                        {project.name}
+                      </a>
+                    ))}
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .skills__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1.5rem, 3vw, 4rem);
+  }
+
+  .skills__group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    padding-top: var(--space-md);
+    border-top: clamp(0.35rem, 0.8vw, 0.75rem) solid var(--group-accent);
+  }
+
+  .skills__group[data-group='comfortable'] {
+    --group-accent: var(--color-accent);
+    --group-soft: var(--color-accent-soft);
+  }
+
+  .skills__group[data-group='learning'] {
+    --group-accent: var(--color-accent-2);
+    --group-soft: var(--color-accent-2-soft);
+  }
+
+  .skills__group[data-group='exploring'] {
+    --group-accent: var(--color-accent-3);
+    --group-soft: var(--color-accent-3-soft);
+  }
+
+  .skills__title {
+    font-size: var(--text-title);
+    font-weight: 600;
+    letter-spacing: var(--tracking-snug);
+    line-height: var(--leading-tight);
+  }
+
+  .skills__list {
+    border-top: var(--line-width) solid var(--color-line);
+  }
+
+  .skills__item {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-xs) var(--space-sm);
+    padding-block: clamp(0.8rem, 1.6vw, 1.2rem);
+    border-bottom: var(--line-width) solid var(--color-line);
+    font-size: clamp(1.15rem, 1.8vw, 1.8rem);
+    font-weight: 550;
+    letter-spacing: var(--tracking-snug);
+    line-height: 1.1;
+    transition:
+      background-color var(--dur-mid) var(--ease-in-out),
+      padding var(--dur-mid) var(--ease-spring);
+  }
+
+  .skills__used {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin-left: auto;
+    font-size: var(--text-micro);
+  }
+
+  .skills__used-label {
+    color: var(--color-text-muted);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .skills__used-link {
+    padding: 0.2rem 0.35rem;
+    border: var(--line-width) solid var(--color-line-strong);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    letter-spacing: var(--tracking-wide);
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition:
+      background-color var(--dur-fast) var(--ease-in-out),
+      border-color var(--dur-fast) var(--ease-in-out),
+      color var(--dur-fast) var(--ease-in-out);
+  }
+
+  .skills__used-link:hover,
+  .skills__used-link:focus-visible {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .skills__item::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 0.3rem;
+    background: var(--group-accent);
+    content: '';
+    scale: 0 1;
+    transform-origin: 50% 0;
+    transition: scale 460ms var(--ease-spring);
+  }
+
+  .skills__item:hover::before {
+    scale: 1 1;
+  }
+
+  .skills__item:hover {
+    padding-left: var(--space-sm);
+    background: var(--group-soft);
+  }
+
+  .skills__index {
+    flex: none;
+    color: var(--group-accent);
+    font-size: var(--text-micro);
+    transition: translate 420ms var(--ease-spring);
+  }
+
+  .skills__item:hover .skills__index {
+    translate: 0.2rem -0.2rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :root.js .skills__item {
+      opacity: 0;
+      translate: 0 1.5rem;
+      transition:
+        opacity 620ms var(--ease-dramatic) var(--item-delay, 0ms),
+        translate 880ms var(--ease-dramatic) var(--item-delay, 0ms),
+        background-color var(--dur-mid) var(--ease-in-out),
+        padding var(--dur-mid) var(--ease-spring);
+    }
+
+    :root.js .skills__group.is-revealed .skills__item {
+      opacity: 1;
+      translate: 0 0;
+    }
+
+    :root.js .skills__group .skills__item:nth-child(2) {
+      --item-delay: 70ms;
+    }
+
+    :root.js .skills__group .skills__item:nth-child(3) {
+      --item-delay: 140ms;
+    }
+
+    :root.js .skills__group .skills__item:nth-child(4) {
+      --item-delay: 210ms;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skills__item,
+    .skills__item::before,
+    .skills__index {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 62rem) {
+    .skills__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .skills__group {
+      display: grid;
+      grid-template-columns: minmax(10rem, 0.4fr) minmax(0, 1fr);
+      gap: var(--space-xl);
+    }
+
+    .skills__title {
+      padding-top: 0.2em;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .skills__group {
+      display: flex;
+    }
+  }
+</style>

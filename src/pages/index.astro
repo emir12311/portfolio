@@ -1,0 +1,25 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Hero from '../components/Hero.astro';
+import Marquee from '../components/Marquee.astro';
+import SectionRenderer from '../components/SectionRenderer.astro';
+import { site } from '../content/site';
+
+const visibleSections = site.sections.filter((section) => section.visible);
+const marqueeItems = site.skills.flatMap((group) => group.items);
+---
+
+<PageLayout title={site.meta.title} description={site.meta.description}>
+  <Hero
+    name={site.name}
+    handle={site.handle}
+    tagline={site.tagline}
+    sections={visibleSections}
+  />
+
+  {marqueeItems.length > 0 && <Marquee items={marqueeItems} />}
+
+  {visibleSections.map((section, index) => (
+    <SectionRenderer section={section} content={site} order={index + 1} />
+  ))}
+</PageLayout>

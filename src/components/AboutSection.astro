@@ -1,0 +1,148 @@
+---
+import type { Section } from '../content/site';
+import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  section: Section;
+  bio: string;
+  tagline: string;
+  order: number;
+  showHeading?: boolean;
+}
+
+const { section, bio, tagline, order, showHeading = true } = Astro.props;
+---
+
+<section
+  class="section about"
+  id={section.id}
+  aria-labelledby={showHeading ? `${section.id}-title` : undefined}
+  aria-label={showHeading ? undefined : section.label}
+>
+  <div class="container section__inner">
+    {showHeading && <SectionHeading index={order} id={section.id} label={section.label} />}
+
+    <div class="about__layout">
+      <p class="about__bio" data-reveal>{bio}</p>
+
+      <aside class="about__aside" data-reveal="right">
+        <span class="about__mark" aria-hidden="true"></span>
+        <p class="about__tagline">{tagline}</p>
+      </aside>
+    </div>
+  </div>
+
+  <span class="about__shape" aria-hidden="true"></span>
+</section>
+
+<style>
+  .about {
+    overflow: clip;
+  }
+
+  .about__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(16rem, 0.65fr);
+    gap: clamp(2rem, 7vw, 9rem);
+    align-items: start;
+  }
+
+  .about__bio {
+    max-width: 27ch;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3.1vw, 3.35rem);
+    font-weight: 400;
+    letter-spacing: var(--tracking-snug);
+    line-height: 1.16;
+  }
+
+  .about__aside {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    padding-top: var(--space-sm);
+    border-top: var(--line-width) solid var(--color-line-strong);
+  }
+
+  .about__mark {
+    width: clamp(2rem, 4vw, 4rem);
+    aspect-ratio: 1;
+    background: var(--color-accent);
+    rotate: 45deg;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :root.js .about__mark {
+      opacity: 0;
+      scale: 0.1;
+      rotate: -135deg;
+      transition:
+        opacity 460ms var(--ease-out) 260ms,
+        scale 1000ms var(--ease-spring) 240ms,
+        rotate 1000ms var(--ease-spring) 240ms;
+    }
+
+    :root.js .about__aside.is-revealed .about__mark {
+      opacity: 1;
+      scale: 1;
+      rotate: 45deg;
+    }
+
+    :root.js .about__tagline {
+      clip-path: inset(0 0 100% 0);
+      transition: clip-path 900ms var(--ease-dramatic) 380ms;
+    }
+
+    :root.js .about__aside.is-revealed .about__tagline {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  .about__tagline {
+    max-width: 14ch;
+    font-family: var(--font-mono);
+    font-size: var(--text-lead);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+
+  .about__shape {
+    position: absolute;
+    right: -5rem;
+    bottom: 8%;
+    width: clamp(10rem, 24vw, 22rem);
+    aspect-ratio: 1;
+    border: clamp(0.4rem, 1vw, 0.9rem) solid var(--color-accent-3);
+    rotate: 18deg;
+    opacity: 0.65;
+    animation: about-drift 12s var(--ease-in-out) infinite alternate;
+  }
+
+  @keyframes about-drift {
+    to {
+      rotate: 28deg;
+      translate: -1.5rem -1rem;
+    }
+  }
+
+  @media (max-width: 54rem) {
+    .about__layout {
+      grid-template-columns: 1fr;
+    }
+
+    .about__bio {
+      max-width: 31ch;
+    }
+
+    .about__tagline {
+      max-width: 24ch;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about__shape {
+      animation: none;
+    }
+  }
+</style>

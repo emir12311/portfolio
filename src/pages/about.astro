@@ -1,0 +1,25 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import AboutSection from '../components/AboutSection.astro';
+import { site } from '../content/site';
+
+const visibleSections = site.sections.filter((section) => section.visible);
+const section = site.sections.find((item) => item.id === 'about')!;
+const order = visibleSections.findIndex((item) => item.id === 'about') + 1;
+---
+
+<PageLayout
+  title={`${section.label} — ${site.name}`}
+  description={`${section.label} — ${site.tagline}`}
+  current="about"
+>
+  <PageIntro index={order} label={section.label} />
+  <AboutSection
+    section={section}
+    bio={site.bio}
+    tagline={site.tagline}
+    order={order}
+    showHeading={false}
+  />
+</PageLayout>

@@ -1,0 +1,38 @@
+---
+import type { SectionId } from '../content/site';
+import BaseLayout from './BaseLayout.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { site } from '../content/site';
+
+interface Props {
+  title: string;
+  description: string;
+  current?: SectionId;
+}
+
+const { title, description, current } = Astro.props;
+const visibleSections = site.sections.filter((section) => section.visible);
+---
+
+<BaseLayout title={title} description={description} siteName={site.name} skipLink={site.ui.skipLink}>
+  <Header
+    name={site.name}
+    handle={site.handle}
+    sections={visibleSections}
+    navLabel={site.ui.navLabel}
+    menuLabel={site.ui.menu}
+    current={current}
+  />
+
+  <main id="main" tabindex="-1">
+    <slot />
+  </main>
+
+  <Footer
+    name={site.name}
+    handle={site.handle}
+    backToTop={site.ui.backToTop}
+    copyright={site.ui.copyright}
+  />
+</BaseLayout>

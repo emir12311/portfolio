@@ -1,0 +1,191 @@
+---
+import type { ContactLink, Section } from '../content/site';
+import Icon from './Icon.astro';
+import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  section: Section;
+  links: ContactLink[];
+  order: number;
+  showHeading?: boolean;
+}
+
+const { section, links, order, showHeading = true } = Astro.props;
+const iconNames = {
+  github: 'github',
+  email: 'mail',
+  discord: 'discord',
+} as const;
+---
+
+<section
+  class="section contact"
+  id={section.id}
+  aria-labelledby={showHeading ? `${section.id}-title` : undefined}
+  aria-label={showHeading ? undefined : section.label}
+>
+  <div class="container section__inner">
+    {showHeading && <SectionHeading index={order} id={section.id} label={section.label} />}
+
+    <ul class="contact__list">
+      {links.map((link, index) => (
+        <li style={`--reveal-order: ${index}`} data-reveal>
+          <a class="contact__link" href={link.href}>
+            <span class="contact__label mono">{link.label}</span>
+            <span class="contact__value">{link.value}</span>
+            <span class="contact__icon">
+              <Icon name={iconNames[link.kind]} />
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <span class="contact__shape contact__shape--one" aria-hidden="true"></span>
+  <span class="contact__shape contact__shape--two" aria-hidden="true"></span>
+</section>
+
+<style>
+  .contact {
+    overflow: clip;
+  }
+
+  .contact__list {
+    border-bottom: var(--line-width) solid var(--color-line-strong);
+  }
+
+  .contact__link {
+    display: grid;
+    grid-template-columns: minmax(7rem, 0.25fr) minmax(0, 1fr) auto;
+    gap: var(--space-lg);
+    align-items: center;
+    padding-block: clamp(1rem, 2.2vw, 1.8rem);
+    border-top: var(--line-width) solid var(--color-line-strong);
+    text-decoration: none;
+    transition:
+      background-color var(--dur-mid) var(--ease-in-out),
+      color var(--dur-mid) var(--ease-in-out),
+      padding var(--dur-mid) var(--ease-out);
+  }
+
+  .contact__link:hover,
+  .contact__link:focus-visible {
+    padding-inline: var(--space-md);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .contact__label {
+    color: var(--color-text-muted);
+    transition: color var(--dur-mid) var(--ease-in-out);
+  }
+
+  .contact__link:hover .contact__label,
+  .contact__link:focus-visible .contact__label {
+    color: currentColor;
+  }
+
+  .contact__value {
+    min-width: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3.4vw, 3.6rem);
+    font-weight: 550;
+    letter-spacing: var(--tracking-snug);
+    line-height: var(--leading-none);
+    overflow-wrap: anywhere;
+    transition: translate 520ms var(--ease-spring);
+  }
+
+  .contact__link:hover .contact__value,
+  .contact__link:focus-visible .contact__value {
+    translate: 0.6rem 0;
+  }
+
+  .contact__icon {
+    display: grid;
+    width: clamp(2.4rem, 4vw, 4rem);
+    aspect-ratio: 1;
+    place-items: center;
+    border: var(--line-width) solid currentColor;
+    font-size: clamp(1rem, 1.6vw, 1.5rem);
+    transition:
+      background-color var(--dur-fast) var(--ease-in-out),
+      color var(--dur-fast) var(--ease-in-out),
+      rotate var(--dur-slow) var(--ease-spring);
+  }
+
+  .contact__link:hover .contact__icon,
+  .contact__link:focus-visible .contact__icon {
+    background: var(--color-on-accent);
+    color: var(--color-accent);
+    rotate: 45deg;
+  }
+
+  .contact__shape {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .contact__shape--one {
+    right: -3rem;
+    bottom: 12%;
+    width: clamp(5rem, 13vw, 12rem);
+    aspect-ratio: 1;
+    border: clamp(0.4rem, 0.8vw, 0.75rem) solid var(--color-accent-2);
+    rotate: 15deg;
+    animation: contact-spin 20s linear infinite;
+  }
+
+  .contact__shape--two {
+    left: 4%;
+    bottom: 2%;
+    width: clamp(3rem, 8vw, 7rem);
+    aspect-ratio: 1;
+    background: var(--color-accent-3-soft);
+    border: var(--line-width) solid var(--color-accent-3);
+    rotate: 45deg;
+    animation: contact-bob 7s var(--ease-in-out) infinite alternate;
+  }
+
+  @keyframes contact-spin {
+    to {
+      rotate: 375deg;
+    }
+  }
+
+  @keyframes contact-bob {
+    to {
+      translate: 0 -1rem;
+      rotate: 60deg;
+    }
+  }
+
+  @media (max-width: 44rem) {
+    .contact__link {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-sm) var(--space-md);
+    }
+
+    .contact__label {
+      grid-column: 1 / -1;
+    }
+
+    .contact__icon {
+      width: 2.4rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .contact__shape {
+      animation: none;
+    }
+
+    .contact__link,
+    .contact__label,
+    .contact__value,
+    .contact__icon {
+      transition: none;
+    }
+  }
+</style>

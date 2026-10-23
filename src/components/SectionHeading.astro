@@ -1,0 +1,97 @@
+---
+interface Props {
+  index: number;
+  id: string;
+  label: string;
+}
+
+const { index, id, label } = Astro.props;
+---
+
+<header class="section-heading" data-reveal="left">
+  <span class="section-heading__index mono" aria-hidden="true">{String(index).padStart(2, '0')}</span>
+  <h2 class="section-heading__title" id={`${id}-title`}>{label}</h2>
+  <span class="section-heading__mark" aria-hidden="true"></span>
+</header>
+
+<style>
+  .section-heading {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: var(--space-lg);
+    align-items: start;
+    margin-bottom: clamp(3rem, 7vw, 7rem);
+  }
+
+  .section-heading__index {
+    padding-top: 0.65em;
+    color: var(--color-accent);
+  }
+
+  .section-heading__title {
+    max-width: 13ch;
+    font-size: var(--text-section);
+    font-weight: 700;
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-none);
+  }
+
+  .section-heading__mark {
+    width: clamp(1.4rem, 4vw, 4rem);
+    aspect-ratio: 1;
+    margin-top: 0.5rem;
+    background: var(--color-accent-2);
+    rotate: 45deg;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :root.js .section-heading__title {
+      clip-path: inset(0 100% 0 0);
+      transition: clip-path 1100ms var(--ease-dramatic) 90ms;
+    }
+
+    :root.js .section-heading__index {
+      opacity: 0;
+      translate: -1.4rem 0;
+      transition:
+        opacity 600ms var(--ease-dramatic) 240ms,
+        translate 950ms var(--ease-dramatic) 180ms;
+    }
+
+    :root.js .section-heading__mark {
+      opacity: 0;
+      scale: 0.2;
+      rotate: -135deg;
+      transition:
+        opacity 500ms var(--ease-out) 320ms,
+        scale 900ms var(--ease-spring) 300ms,
+        rotate 900ms var(--ease-spring) 300ms;
+    }
+
+    :root.js .section-heading.is-revealed .section-heading__title {
+      clip-path: inset(0 0 0 0);
+    }
+
+    :root.js .section-heading.is-revealed .section-heading__index {
+      opacity: 1;
+      translate: 0 0;
+    }
+
+    :root.js .section-heading.is-revealed .section-heading__mark {
+      opacity: 1;
+      scale: 1;
+      rotate: 45deg;
+    }
+  }
+
+  @media (max-width: 44rem) {
+    .section-heading {
+      grid-template-columns: auto 1fr;
+      gap: var(--space-md);
+    }
+
+    .section-heading__mark {
+      display: none;
+    }
+  }
+</style>
