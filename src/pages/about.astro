@@ -3,16 +3,26 @@ import PageLayout from '../layouts/PageLayout.astro';
 import PageIntro from '../components/PageIntro.astro';
 import AboutSection from '../components/AboutSection.astro';
 import { site } from '../content/site';
+import { buildGraph, pageDescription } from '../lib/seo';
 
 const visibleSections = site.sections.filter((section) => section.visible);
 const section = site.sections.find((item) => item.id === 'about')!;
 const order = visibleSections.findIndex((item) => item.id === 'about') + 1;
+
+const description = pageDescription('about');
+const schema = buildGraph({
+  path: '/about',
+  name: section.label,
+  description,
+  kind: 'ProfilePage',
+});
 ---
 
 <PageLayout
   title={`${section.label} — ${site.name}`}
-  description={`${section.label} — ${site.tagline}`}
+  description={description}
   current="about"
+  schema={schema}
 >
   <PageIntro index={order} label={section.label} />
   <AboutSection

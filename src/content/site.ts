@@ -78,6 +78,11 @@ export interface SiteContent {
     skipLink: string;
     navLabel: string;
     menu: string;
+    notFound: {
+      title: string;
+      body: string;
+      home: string;
+    };
     links: {
       source: string;
       release: string;
@@ -337,6 +342,11 @@ export const site: SiteContent = {
     skipLink: 'Skip to content',
     navLabel: 'Primary',
     menu: 'Menu',
+    notFound: {
+      title: 'Page not found',
+      body: 'That page does not exist. It may have moved, or the link may be wrong.',
+      home: 'Home',
+    },
     links: {
       source: 'Repository',
       release: 'Latest release',

@@ -3,10 +3,19 @@ import PageLayout from '../layouts/PageLayout.astro';
 import PageIntro from '../components/PageIntro.astro';
 import SkillsSection from '../components/SkillsSection.astro';
 import { site } from '../content/site';
+import { buildGraph, pageDescription } from '../lib/seo';
 
 const visibleSections = site.sections.filter((section) => section.visible);
 const section = site.sections.find((item) => item.id === 'skills')!;
 const order = visibleSections.findIndex((item) => item.id === 'skills') + 1;
+
+const description = pageDescription('skills');
+const schema = buildGraph({
+  path: '/tools',
+  name: section.label,
+  description,
+  kind: 'CollectionPage',
+});
 
 const tokens = (value: string) =>
   value
@@ -45,8 +54,9 @@ for (const group of site.skills) {
 
 <PageLayout
   title={`${section.label} — ${site.name}`}
-  description={`${section.label} — ${site.tagline}`}
+  description={description}
   current="skills"
+  schema={schema}
 >
   <PageIntro index={order} label={section.label} />
 

@@ -6,9 +6,11 @@ interface Props {
   description: string;
   siteName: string;
   skipLink: string;
+  schema?: Record<string, unknown>;
+  noindex?: boolean;
 }
 
-const { title, description, siteName, skipLink } = Astro.props;
+const { title, description, siteName, skipLink, schema, noindex } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImageURL = new URL('/og.png', Astro.site);
@@ -21,6 +23,7 @@ const ogImageURL = new URL('/og.png', Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonicalURL} />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:type" content="website" />
@@ -37,7 +40,11 @@ const ogImageURL = new URL('/og.png', Astro.site);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>{title}</title>
+    {schema && (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+    )}
     <script is:inline>
       document.documentElement.classList.add('js');
     </script>

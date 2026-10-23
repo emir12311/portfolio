@@ -9,13 +9,22 @@ interface Props {
   title: string;
   description: string;
   current?: SectionId;
+  schema?: Record<string, unknown>;
+  noindex?: boolean;
 }
 
-const { title, description, current } = Astro.props;
+const { title, description, current, schema, noindex } = Astro.props;
 const visibleSections = site.sections.filter((section) => section.visible);
 ---
 
-<BaseLayout title={title} description={description} siteName={site.name} skipLink={site.ui.skipLink}>
+<BaseLayout
+  title={title}
+  description={description}
+  siteName={site.name}
+  skipLink={site.ui.skipLink}
+  schema={schema}
+  noindex={noindex}
+>
   <Header
     name={site.name}
     handle={site.handle}

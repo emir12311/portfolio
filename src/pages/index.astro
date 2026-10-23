@@ -4,12 +4,16 @@ import Hero from '../components/Hero.astro';
 import Marquee from '../components/Marquee.astro';
 import SectionRenderer from '../components/SectionRenderer.astro';
 import { site } from '../content/site';
+import { buildGraph, pageDescription } from '../lib/seo';
 
 const visibleSections = site.sections.filter((section) => section.visible);
 const marqueeItems = site.skills.flatMap((group) => group.items);
+
+const description = pageDescription('/');
+const schema = buildGraph({ path: '/', name: site.name, description, kind: 'WebPage' });
 ---
 
-<PageLayout title={site.meta.title} description={site.meta.description}>
+<PageLayout title={site.meta.title} description={description} schema={schema}>
   <Hero
     name={site.name}
     handle={site.handle}

@@ -168,15 +168,36 @@ public/
 - Skip link, semantic landmarks, one `h1` (hero), `h2` per section, `h3` per project
 - Data-driven alt text on project images; decorative shapes and the duplicated marquee are
   `aria-hidden`
-- Theme controls and the mobile disclosure are keyboard operable with visible focus and
-  `aria-pressed` state
+- The mobile disclosure is keyboard operable with visible focus, and the current route is marked
+  with `aria-current="page"`
 - All motion — the hero character cascade, masked tagline, section wipes, project cascades,
   marquee and hover choreography — is disabled under `prefers-reduced-motion: reduce`
 - Scroll-linked effects (`animation-timeline: scroll()`, used for the shape parallax and the
   header progress bar) are progressive enhancement behind `@supports`, so browsers without
   support simply get the static layout
-- With JavaScript off, all content still renders and the theme falls back to the system color
-  scheme; only the theme toggle and scroll reveals stop working
+- With JavaScript off, all content still renders and the colour scheme follows the device; only
+  the scroll reveals stop working
+
+## SEO and machine-readable metadata
+
+Everything below is generated from `src/content/site.ts`, so metadata cannot drift from content:
+
+- `src/lib/seo.ts` builds a schema.org `@graph` per page: `Person` (sameAs GitHub, `knowsAbout`
+  from the skill groups), `WebSite`, a typed page node (`WebPage`, `CollectionPage`,
+  `ProfilePage`, `ContactPage`), `BreadcrumbList` on inner pages, and one `SoftwareSourceCode`
+  per project with `codeRepository`, `license`, `keywords` and `programmingLanguage`.
+  `pageDescription()` derives a per-page meta description (the bio's first sentence for /about,
+  project names for /projects, skill groups for /tools).
+- Canonical link and `og:url` come from `site` in `astro.config.mjs`; `og:image` points at
+  `public/og.png` (1200×630).
+- `public/robots.txt` allows search engines and names the AI/answer-engine crawlers explicitly
+  (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended, CCBot…).
+- `/llms.txt` and `/sitemap.xml` are endpoints generated from the same section data.
+- `src/pages/404.astro` is real, carries `noindex, follow`, and is served by Workers via
+  `not_found_handling = "404-page"`.
+- The sitemap intentionally has no `<lastmod>`: there is no reliable per-page modification
+  signal, and a build timestamp would claim every page changed on every deploy.
+- Not done: per-page `og:image` variants (one card is shared) and hreflang (single language).
 
 ## Deployment
 
