@@ -181,21 +181,34 @@ public/
 ## Deployment
 
 The build output in `dist/` is plain static files and can be hosted anywhere. Production target is
-**Cloudflare Pages** at <https://emir12311.dev>.
+**Cloudflare Workers** (Static Assets) at <https://emir12311.dev>, built from this GitHub repo.
 
 `astro.config.mjs` sets `site: 'https://emir12311.dev'`, which drives the canonical link and
 `og:url` in every page. `public/robots.txt` and `src/pages/sitemap.xml.ts` are generated from the
-same `sections` data, so new sections appear in the sitemap automatically.
+same `sections` data, so new sections appear in the sitemap automatically. `og:image` points at
+`public/og.png` (1200×630).
 
-Cloudflare Pages build settings:
+`wrangler.toml` serves the build as Worker assets — no `main` entrypoint, so it deploys an
+assets-only Worker:
 
-| Setting             | Value          |
-| ------------------- | -------------- |
-| Framework preset    | Astro          |
-| Build command       | `npm run build` |
-| Build output        | `dist`         |
-| Environment variable | `NODE_VERSION=22` (package.json requires Node >= 22) |
+```toml
+name = "portfolio"
+compatibility_date = "2026-10-23"
 
-Direct upload without Git also works: `npx wrangler pages deploy dist --project-name=emir-portfolio`.
+[assets]
+directory = "./dist"
+```
 
-Not done yet: OG image (`og:image`). Everything else for the domain is in place.
+Cloudflare build settings (Workers Builds):
+
+| Setting         | Value                                              |
+| --------------- | -------------------------------------------------- |
+| Build command   | `npm run build`                                    |
+| Deploy command  | `npx wrangler deploy`                              |
+| Node version    | pinned to 22 by `.node-version`                    |
+
+Local check before pushing: `npx wrangler deploy --dry-run` reports the asset file count without
+touching production.
+
+Cloudflare **Pages** also works if preferred — same repo, build command `npm run build`, output
+directory `dist`, or direct upload with `npx wrangler pages deploy dist --project-name=portfolio`.
