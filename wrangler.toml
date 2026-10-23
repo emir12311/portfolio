@@ -1,0 +1,7 @@
+# Cloudflare Workers Builds: serve the Astro static output as Worker assets.
+# No `main` entrypoint on purpose — this deploys an assets-only Worker.
+name = "portfolio"
+compatibility_date = "2026-10-23"
+
+[assets]
+directory = "./dist"
