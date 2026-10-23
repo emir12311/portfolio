@@ -188,6 +188,10 @@ The build output in `dist/` is plain static files and can be hosted anywhere. Pr
 same `sections` data, so new sections appear in the sitemap automatically. `og:image` points at
 `public/og.png` (1200×630).
 
+`src/pages/llms.txt.ts` serves `/llms.txt` (the [llmstxt.org](https://llmstxt.org) convention) —
+also generated from `site.ts`, so the page list, projects, tech stacks and contact links stay in
+sync with the content rather than being a second copy of it.
+
 `wrangler.toml` serves the build as Worker assets — no `main` entrypoint, so it deploys an
 assets-only Worker:
 
